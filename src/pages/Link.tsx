@@ -1,7 +1,5 @@
-import React from "react";
-
 function Link() {
-  return <div>LandingPage</div>;
+  return <div>Link Page</div>;
 }
 
 export default Link;

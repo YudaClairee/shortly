@@ -1,7 +1,5 @@
-import React from "react";
-
 function RedirectLink() {
-  return <div>LandingPage</div>;
+  return <div>Redirecting...</div>;
 }
 
 export default RedirectLink;

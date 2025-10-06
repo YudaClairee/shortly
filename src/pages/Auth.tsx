@@ -1,19 +1,146 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { login, loginWithGoogle, signup } from "@/db/apiAuth";
+import { useAuth } from "@/hooks/useAuthUser";
 
 function Auth() {
+  const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useAuth();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Supabase Google OAuth
-    console.log("Google login clicked");
+  // Login form state
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+
+  // Signup form state
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
+  const [signupPassword, setSignupPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Redirect ke dashboard kalo udah login
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, authLoading, navigate]);
+
+  const handleGoogleLogin = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      await loginWithGoogle();
+      // Redirect akan otomatis dilakukan oleh Supabase
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Gagal login dengan Google"
+      );
+      console.error("Google login error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Validasi
+      if (!loginEmail || !loginPassword) {
+        setError("Email dan password harus diisi");
+        return;
+      }
+
+      if (!/\S+@\S+\.\S+/.test(loginEmail)) {
+        setError("Format email tidak valid");
+        return;
+      }
+
+      // Login dengan email/password
+      await login(loginEmail, loginPassword);
+
+      // Auth state akan auto-update via onAuthStateChange
+      // useEffect di atas akan handle redirect ke dashboard
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal login");
+      console.error("Login error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Validasi
+      if (!signupName || !signupEmail || !signupPassword || !confirmPassword) {
+        setError("Semua field harus diisi");
+        return;
+      }
+
+      if (!/\S+@\S+\.\S+/.test(signupEmail)) {
+        setError("Format email tidak valid");
+        return;
+      }
+
+      if (signupPassword.length < 8) {
+        setError("Password minimal 8 karakter");
+        return;
+      }
+
+      if (signupPassword !== confirmPassword) {
+        setError("Password dan konfirmasi password tidak cocok");
+        return;
+      }
+
+      if (!agreeToTerms) {
+        setError("Anda harus menyetujui Syarat & Ketentuan");
+        return;
+      }
+
+      // Signup dengan email/password
+      await signup(signupEmail, signupPassword, signupName);
+
+      // Auth state akan auto-update via onAuthStateChange
+      // useEffect di atas akan handle redirect ke dashboard
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal mendaftar");
+      console.error("Signup error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Show loading saat check auth state
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -24,6 +151,13 @@ function Auth() {
             Selamat datang! Silakan masuk atau daftar
           </p>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+            <p className="text-destructive text-sm">{error}</p>
+          </div>
+        )}
 
         <Card className="border border-border shadow-xl bg-card backdrop-blur-sm">
           <CardHeader className="space-y-1 pb-4">
@@ -39,11 +173,13 @@ function Auth() {
 
               {/* Login Tab */}
               <TabsContent value="login" className="space-y-4">
-                <div className="space-y-4">
+                <form onSubmit={handleLogin} className="space-y-4">
                   <Button
+                    type="button"
                     variant="outline"
                     className="w-full h-12 border-border hover:bg-[#7B35E6] transition-colors bg-[#7B35E6]/50"
                     onClick={handleGoogleLogin}
+                    disabled={loading}
                   >
                     <svg viewBox="0 0 128 128">
                       <path
@@ -96,6 +232,9 @@ function Auth() {
                           type="email"
                           placeholder="nama@email.com"
                           className="pl-10 h-12 border-border focus:border-primary focus:ring-primary"
+                          value={loginEmail}
+                          onChange={(e) => setLoginEmail(e.target.value)}
+                          disabled={loading}
                         />
                       </div>
                     </div>
@@ -114,6 +253,9 @@ function Auth() {
                           type={showPassword ? "text" : "password"}
                           placeholder="Masukkan password"
                           className="pl-10 pr-10 h-12 border-border focus:border-primary focus:ring-primary"
+                          value={loginPassword}
+                          onChange={(e) => setLoginPassword(e.target.value)}
+                          disabled={loading}
                         />
                         <button
                           type="button"
@@ -134,30 +276,42 @@ function Auth() {
                         <input
                           type="checkbox"
                           className="rounded border-border"
+                          checked={rememberMe}
+                          onChange={(e) => setRememberMe(e.target.checked)}
+                          disabled={loading}
                         />
                         <span className="text-muted-foreground">
                           Ingat saya
                         </span>
                       </label>
-                      <button className="text-sm text-primary hover:text-primary/80 font-medium">
+                      <button
+                        type="button"
+                        className="text-sm text-primary hover:text-primary/80 font-medium"
+                      >
                         Lupa password?
                       </button>
                     </div>
 
-                    <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
-                      Masuk
+                    <Button
+                      type="submit"
+                      className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+                      disabled={loading}
+                    >
+                      {loading ? "Memproses..." : "Masuk"}
                     </Button>
                   </div>
-                </div>
+                </form>
               </TabsContent>
 
               {/* Signup Tab */}
               <TabsContent value="signup" className="space-y-4">
-                <div className="space-y-4">
+                <form onSubmit={handleSignup} className="space-y-4">
                   <Button
+                    type="button"
                     variant="outline"
                     className="w-full h-12 border-border hover:bg-accent transition-colors"
                     onClick={handleGoogleLogin}
+                    disabled={loading}
                   >
                     <svg viewBox="0 0 128 128">
                       <path
@@ -210,6 +364,9 @@ function Auth() {
                           type="text"
                           placeholder="Masukkan nama lengkap"
                           className="pl-10 h-12 border-border focus:border-primary focus:ring-primary"
+                          value={signupName}
+                          onChange={(e) => setSignupName(e.target.value)}
+                          disabled={loading}
                         />
                       </div>
                     </div>
@@ -228,6 +385,9 @@ function Auth() {
                           type="email"
                           placeholder="nama@email.com"
                           className="pl-10 h-12 border-border focus:border-primary focus:ring-primary"
+                          value={signupEmail}
+                          onChange={(e) => setSignupEmail(e.target.value)}
+                          disabled={loading}
                         />
                       </div>
                     </div>
@@ -246,6 +406,9 @@ function Auth() {
                           type={showPassword ? "text" : "password"}
                           placeholder="Minimal 8 karakter"
                           className="pl-10 pr-10 h-12 border-border focus:border-primary focus:ring-primary"
+                          value={signupPassword}
+                          onChange={(e) => setSignupPassword(e.target.value)}
+                          disabled={loading}
                         />
                         <button
                           type="button"
@@ -275,6 +438,9 @@ function Auth() {
                           type={showConfirmPassword ? "text" : "password"}
                           placeholder="Ulangi password"
                           className="pl-10 pr-10 h-12 border-border focus:border-primary focus:ring-primary"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          disabled={loading}
                         />
                         <button
                           type="button"
@@ -296,24 +462,37 @@ function Auth() {
                       <input
                         type="checkbox"
                         className="mt-1 rounded border-border"
+                        checked={agreeToTerms}
+                        onChange={(e) => setAgreeToTerms(e.target.checked)}
+                        disabled={loading}
                       />
                       <span className="text-sm text-muted-foreground">
                         Saya setuju dengan{" "}
-                        <button className="text-primary hover:text-primary/80 font-medium">
+                        <button
+                          type="button"
+                          className="text-primary hover:text-primary/80 font-medium"
+                        >
                           Syarat & Ketentuan
                         </button>{" "}
                         dan{" "}
-                        <button className="text-primary hover:text-primary/80 font-medium">
+                        <button
+                          type="button"
+                          className="text-primary hover:text-primary/80 font-medium"
+                        >
                           Kebijakan Privasi
                         </button>
                       </span>
                     </div>
 
-                    <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium">
-                      Daftar Sekarang
+                    <Button
+                      type="submit"
+                      className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+                      disabled={loading}
+                    >
+                      {loading ? "Memproses..." : "Daftar Sekarang"}
                     </Button>
                   </div>
-                </div>
+                </form>
               </TabsContent>
             </Tabs>
           </CardHeader>
