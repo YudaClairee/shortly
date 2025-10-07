@@ -10,10 +10,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOutIcon } from "lucide-react";
+import { useAuthUser } from "@/hooks/useAuthUser";
+import { logout } from "@/db/apiAuth";
 
 function Header() {
   const navigate = useNavigate();
-  const user = false;
+  const user = useAuthUser();
 
   return (
     <div className="sticky top-4 mx-auto z-50 w-full max-w-4xl px-4">
@@ -32,12 +34,14 @@ function Header() {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>Djibyuda</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  {user?.user_metadata?.full_name}
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>My Links</DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => logout()}>
                   <LogOutIcon className="w-4 h-4" />
-                  logout
+                  Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
