@@ -120,7 +120,7 @@ function LandingPage() {
       <section className="container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12 text-white">
-            Kenapa Harus Pakai Link Shortener Ini?
+            Kenapa Harus Pakai Shortly?
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center space-y-4 p-6 rounded-2xl hover:bg-white/10 hover:shadow-lg transition-all">

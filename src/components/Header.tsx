@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { LogOutIcon } from "lucide-react";
+import { Link2, LogOutIcon } from "lucide-react";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { logout } from "@/db/apiAuth";
 
@@ -38,7 +38,10 @@ function Header() {
                   {user?.user_metadata?.full_name}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>My Links</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/dashboard")}>
+                  <Link2 className="w-4 h-4" />
+                  My Links
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => logout()}>
                   <LogOutIcon className="w-4 h-4" />
                   Logout
