@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import CreateLink from "@/components/create-link";
 
 interface Url {
   id: string;
@@ -232,14 +233,7 @@ function Dashboard() {
                 className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-gray-400 focus-visible:ring-[#9043E5]"
               />
             </div>
-            <Button
-              onClick={() => navigate("/auth?createNew=true")}
-              className="bg-gradient-to-r from-[#9043E5] to-[#7B35E6] hover:from-[#9043E5]/90 hover:to-[#7B35E6]/90 text-white font-semibold"
-              size="lg"
-            >
-              <Plus className="h-5 w-5" />
-              Tambah Link Baru
-            </Button>
+            <CreateLink />
           </div>
 
           {/* Links List */}
