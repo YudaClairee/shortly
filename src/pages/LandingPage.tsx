@@ -171,13 +171,13 @@ function LandingPage() {
               value="item-1"
               className="bg-white/10 backdrop-blur-sm rounded-xl px-6 border border-white/20 shadow-sm"
             >
-              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-white">
-                Apa itu URL Shortener?
+              <AccordionTrigger className="text-xl font-semibold hover:no-underline text-white">
+                Apa itu Shortly?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300">
-                URL Shortener adalah tools yang bikin link panjang jadi lebih
-                pendek dan gampang dibaca. Cocok banget buat dibagikan di social
-                media atau di mana aja yang butuh link yang ringkas.
+              <AccordionContent className="text-gray-300 text-lg">
+                Shortly adalah tools yang bikin link panjang jadi lebih pendek
+                dan gampang dibaca. Cocok banget buat dibagikan di social media
+                atau di mana aja yang butuh link yang ringkas.
               </AccordionContent>
             </AccordionItem>
 
@@ -185,10 +185,10 @@ function LandingPage() {
               value="item-2"
               className="bg-white/10 backdrop-blur-sm rounded-xl px-6 border border-white/20 shadow-sm"
             >
-              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-white">
+              <AccordionTrigger className="text-xl font-semibold hover:no-underline text-white">
                 Apakah gratis?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300">
+              <AccordionContent className="text-gray-300 text-lg">
                 Tentu aja! Kamu bisa ringkas URL sebanyak yang kamu mau tanpa
                 bayar sepeser pun. Nikmatin fitur lengkapnya secara gratis.
               </AccordionContent>
@@ -198,10 +198,10 @@ function LandingPage() {
               value="item-3"
               className="bg-white/10 backdrop-blur-sm rounded-xl px-6 border border-white/20 shadow-sm"
             >
-              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-white">
+              <AccordionTrigger className="text-xl font-semibold hover:no-underline text-white">
                 Apakah link yang diringkas aman?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300">
+              <AccordionContent className="text-gray-300 text-lg">
                 Absolutely! Semua link yang diringkas tetap mengarah ke URL asli
                 kamu dan dijaga keamanannya. Kita nggak mengubah atau menyimpan
                 data sensitif apapun.
@@ -212,10 +212,10 @@ function LandingPage() {
               value="item-4"
               className="bg-white/10 backdrop-blur-sm rounded-xl px-6 border border-white/20 shadow-sm"
             >
-              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-white">
+              <AccordionTrigger className="text-xl font-semibold hover:no-underline text-white">
                 Berapa lama link bertahan?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300">
+              <AccordionContent className="text-gray-300 text-lg">
                 Link yang udah kamu buat akan bertahan selamanya! Nggak ada
                 expired date, jadi tenang aja buat dibagikan kapan pun.
               </AccordionContent>
@@ -225,10 +225,10 @@ function LandingPage() {
               value="item-5"
               className="bg-white/10 backdrop-blur-sm rounded-xl px-6 border border-white/20 shadow-sm"
             >
-              <AccordionTrigger className="text-lg font-semibold hover:no-underline text-white">
+              <AccordionTrigger className="text-xl font-semibold hover:no-underline text-white">
                 Bisa track berapa banyak yang klik link saya?
               </AccordionTrigger>
-              <AccordionContent className="text-gray-300">
+              <AccordionContent className="text-gray-300 text-lg">
                 Coming soon! Fitur analytics sedang dalam pengembangan. Nanti
                 kamu bisa lihat berapa kali link kamu diklik dan dari mana aja
                 traffic-nya datang.

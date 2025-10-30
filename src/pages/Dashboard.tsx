@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuthUser } from "@/hooks/useAuthUser";
-import { getUrls } from "@/db/apiUrls";
+import { deleteUrl, getUrls } from "@/db/apiUrls";
 import { getClicks } from "@/db/apiClicks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,8 +21,10 @@ import {
   Trash2,
   BarChart3,
   Calendar,
+  Download,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface Url {
   id: string;
@@ -78,12 +80,12 @@ function Dashboard() {
   }, [user?.id, fetchData]);
 
   const filteredUrls = urls.filter((url) => {
-    const query = searchQuery.toLowerCase();
+    const query = searchQuery?.toLowerCase() || "";
     return (
-      url.original_url.toLowerCase().includes(query) ||
-      url.short_url.toLowerCase().includes(query) ||
-      url.custom_url?.toLowerCase().includes(query) ||
-      url.title?.toLowerCase().includes(query)
+      url.original_url?.toLowerCase()?.includes(query) ||
+      url.short_url?.toLowerCase()?.includes(query) ||
+      url.custom_url?.toLowerCase()?.includes(query) ||
+      url.title?.toLowerCase()?.includes(query)
     );
   });
 
@@ -98,6 +100,62 @@ function Dashboard() {
     await navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleDownload = async (url: string, title: string) => {
+    try {
+      if (!url) {
+        toast.error("QR Code tidak tersedia", {
+          duration: 2000,
+          position: "bottom-right",
+        });
+        return;
+      }
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error("Gagal mengunduh QR Code");
+      }
+
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      a.download = `${title}-qr.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(downloadUrl);
+
+      toast.success("QR Code berhasil diunduh!", {
+        duration: 2000,
+        position: "bottom-right",
+      });
+    } catch (error) {
+      console.error("Error downloading QR code:", error);
+      toast.error("Gagal mengunduh QR Code", {
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteUrl(id);
+    } catch (error) {
+      console.error("Error deleting url:", error);
+      toast.error("Gagal menghapus link", {
+        duration: 2000,
+        position: "bottom-right",
+      });
+    }
+    toast.success("Link berhasil dihapus!", {
+      duration: 2000,
+      position: "bottom-right",
+    });
+    fetchData();
   };
 
   const formatDate = (dateString: string) => {
@@ -222,7 +280,7 @@ function Dashboard() {
               filteredUrls.map((url) => {
                 const urlClicks = getUrlClicks(url.id);
                 const shortUrl = url.custom_url || url.short_url;
-                const fullShortUrl = `${shortUrl}`;
+                const fullShortUrl = `https://short.ly/${shortUrl}`;
 
                 return (
                   <Card
@@ -232,6 +290,9 @@ function Dashboard() {
                     <CardContent className="p-6">
                       <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                         {/* Left Section - URL Info */}
+                        <div className="w-40 h-40 bg-white/5 border-white/10 rounded-lg p-2 flex items-center justify-center">
+                          <img src={url.qr || ""} alt="QR Code" />
+                        </div>
                         <div className="flex-1 space-y-3 min-w-0">
                           {/* Title or Original URL */}
                           <div>
@@ -298,14 +359,24 @@ function Dashboard() {
                             className="flex-1 lg:flex-none border-[#9043E5]/30 text-[#9043E5] hover:bg-[#9043E5]/10"
                           >
                             <BarChart3 className="h-4 w-4" />
-                            Detail
                           </Button>
                           <Button
+                            onClick={() => handleDelete(url.id)}
                             variant="outline"
                             size="icon-sm"
                             className="border-red-500/30 text-red-500 hover:bg-red-500/10"
                           >
                             <Trash2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              handleDownload(url.qr || "", url.title || "")
+                            }
+                            variant="outline"
+                            size="icon-sm"
+                            className="border-green-500/30 text-green-500 hover:bg-green-500/10"
+                          >
+                            <Download className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
