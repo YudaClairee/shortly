@@ -68,11 +68,11 @@ function Link() {
   const user = useAuthUser();
   useEffect(() => {
     const fetchData = async () => {
-      if (!id) return;
+      if (!id || !user?.id) return;
 
       try {
         setLoading(true);
-        const urlData = await getUrl(id, user?.id || "");
+        const urlData = await getUrl(id, user.id);
         setUrl(urlData as Url);
 
         const clicksData = await getClicksForUrl(id);
@@ -89,7 +89,7 @@ function Link() {
     };
 
     fetchData();
-  }, [id]);
+  }, [id, user?.id]);
 
   const handleCopy = async (text: string, copyId: string) => {
     await navigator.clipboard.writeText(text);
