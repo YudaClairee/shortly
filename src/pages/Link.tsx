@@ -244,7 +244,7 @@ function Link() {
   }
 
   const shortUrl = url.custom_url || url.short_url;
-  const fullShortUrl = `https://short.ly/${shortUrl}`;
+  const fullShortUrl = `https://shortlyid.netlify.app/${shortUrl}`;
 
   return (
     <div className="min-h-screen pb-16">
