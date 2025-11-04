@@ -274,7 +274,7 @@ function Dashboard() {
               filteredUrls.map((url) => {
                 const urlClicks = getUrlClicks(url.id);
                 const shortUrl = url.custom_url || url.short_url;
-                const fullShortUrl = `https://short.ly/${shortUrl}`;
+                const fullShortUrl = `https://shortlyid.netlify.app/${shortUrl}`;
 
                 return (
                   <Card
