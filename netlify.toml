@@ -1,0 +1,13 @@
+# Netlify configuration
+[build]
+  # Build command (adjust if needed)
+  command = "bun run build"
+  # Output directory after build
+  publish = "dist"
+
+# Redirect all routes to index.html for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
