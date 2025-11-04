@@ -28,14 +28,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Helper function buat clean URL dari hash fragments
+    const cleanUrl = () => {
+      // Pastikan remove hash completely (bahkan sisa # aja)
+      const cleanPath = window.location.pathname + window.location.search;
+      window.history.replaceState(null, "", cleanPath);
+    };
+
     // Check initial session saat app load
     const initializeAuth = async () => {
       try {
+        // Detect kalo ada OAuth callback hash
+        const hasAuthHash =
+          window.location.hash &&
+          (window.location.hash.includes("access_token") ||
+            window.location.hash.includes("error"));
+
         const currentUser = await getCurrentUser();
         setUser(currentUser);
+
+        // Cleanup URL immediately setelah user data retrieved
+        if (hasAuthHash) {
+          cleanUrl();
+        }
       } catch (error) {
         console.error("Error initializing auth:", error);
         setUser(null);
+
+        // Clean URL even on error (mungkin ada error hash)
+        if (window.location.hash) {
+          cleanUrl();
+        }
       } finally {
         setLoading(false);
       }
@@ -47,18 +70,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (supabase) {
       const {
         data: { subscription },
-      } = supabase.auth.onAuthStateChange(async (event, session) => {
+      } = supabase.auth.onAuthStateChange(async (_event, session) => {
         setUser(session?.user ?? null);
         setLoading(false);
 
-        // Clean up URL hash setelah OAuth callback sukses
-        if (event === "SIGNED_IN" && window.location.hash) {
-          // Replace URL tanpa hash buat bersihin tokens dari URL
-          window.history.replaceState(
-            null,
-            "",
-            window.location.pathname + window.location.search
-          );
+        // Clean URL setelah any auth event yang ada hash
+        // Ini handle cases dimana onAuthStateChange trigger setelah hash parsed
+        if (window.location.hash) {
+          cleanUrl();
         }
       });
 
