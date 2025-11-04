@@ -13,3 +13,18 @@ export async function getClicks(urlIds: string[]) {
   }
   return clicks ?? [];
 }
+
+export async function getClicksForUrl(urlId: string) {
+  if (!supabase) return [];
+
+  const { data: clicks, error } = await supabase
+    .from("clicks")
+    .select("*")
+    .eq("url_id", urlId)
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error("Error getting clicks for url:", error.message);
+    throw new Error("unable to get clicks for url");
+  }
+  return clicks ?? [];
+}

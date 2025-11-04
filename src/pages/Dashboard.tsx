@@ -290,7 +290,10 @@ function Dashboard() {
                         <div className="flex-1 space-y-3 min-w-0">
                           {/* Title or Original URL */}
                           <div>
-                            <h3 className="text-lg font-semibold text-white mb-1 truncate">
+                            <h3
+                              onClick={() => navigate(`/link/${url.id}`)}
+                              className="text-lg font-semibold text-white mb-1 truncate cursor-pointer hover:text-[#9043E5] transition-colors"
+                            >
                               {url.title || "Untitled Link"}
                             </h3>
                             <a
