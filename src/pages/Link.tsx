@@ -24,6 +24,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 interface Url {
   id: string;
@@ -64,15 +65,15 @@ function Link() {
   const [clicks, setClicks] = useState<Click[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
-
+  const user = useAuthUser();
   useEffect(() => {
     const fetchData = async () => {
       if (!id) return;
 
       try {
         setLoading(true);
-        const urlData = await getUrl(id);
-        setUrl(urlData);
+        const urlData = await getUrl(id, user?.id || "");
+        setUrl(urlData as Url);
 
         const clicksData = await getClicksForUrl(id);
         setClicks(clicksData);

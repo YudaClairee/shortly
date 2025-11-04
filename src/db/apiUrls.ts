@@ -85,12 +85,13 @@ export async function getLongUrl(id: string) {
   return data;
 }
 
-export async function getUrl(id: string) {
+export async function getUrl(id: string, userId: string) {
   if (!supabase) return;
   const { data: url, error } = await supabase
     .from("urls")
     .select("*")
     .eq("id", id)
+    .eq("user_id", userId)
     .single();
   if (error) {
     console.error("Error getting url:", error.message);
