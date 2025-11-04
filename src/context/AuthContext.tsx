@@ -47,9 +47,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (supabase) {
       const {
         data: { subscription },
-      } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
         setUser(session?.user ?? null);
         setLoading(false);
+
+        // Clean up URL hash setelah OAuth callback sukses
+        if (event === "SIGNED_IN" && window.location.hash) {
+          // Replace URL tanpa hash buat bersihin tokens dari URL
+          window.history.replaceState(
+            null,
+            "",
+            window.location.pathname + window.location.search
+          );
+        }
       });
 
       // Cleanup subscription on unmount
